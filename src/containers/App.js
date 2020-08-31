@@ -4,15 +4,20 @@ import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
 import "./App.css";
 
-import { setSearchField } from "../actions/Actions";
+import { setSearchField, setRequestRobots } from "../actions/Actions";
 import { connect } from "react-redux";
 
 const mapStatesToProps = (state) => {
-  return { searchField: state.searchField };
+  return {
+    searchField: state.searchRobots.searchField,
+    robots: state.requestRobots.robots,
+    isPending: state.requestRobots.isPending,
+  };
 };
 const mapDispatchsToProps = (dispatch) => {
   return {
     onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+    onRequestRobots: () => dispatch(setRequestRobots()),
   };
 };
 class App extends Component {
@@ -23,14 +28,12 @@ class App extends Component {
     };
   }
   componentDidMount() {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((res) => res.json())
-      .then((data) => this.setState({ robots: data }));
+    this.props.onRequestRobots();
   }
 
   render() {
-    const { searchField, onSearchChange } = this.props;
-    const filterRobot = this.state.robots.filter((robot) => {
+    const { searchField, onSearchChange, robots } = this.props;
+    const filterRobot = robots.filter((robot) => {
       return robot.name.toLowerCase().includes(searchField.toLowerCase());
     });
     return (
